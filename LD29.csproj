@@ -33,6 +33,22 @@
     <TypeScriptCompile Include="src\main\d.ts\hammerjs.d.ts" />
     <TypeScriptCompile Include="src\main\d.ts\jquery.d.ts" />
     <TypeScriptCompile Include="src\main\d.ts\XSLTProcessor.d.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\State\AbstractState.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\State\Home\HomeData.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\State\Home\HomeState.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\State\IState.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\State\IStateListener.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\State\Play\PlayData.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\State\Play\PlayState.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\State\StateEngine.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\Transformer\ITemplateTransformerFactory.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\Transformer\ITransformer.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\Transformer\ITransformerFactory.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\Transformer\XSL\StandardXSLTransformer.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\Transformer\XSL\StandardXSLTransformerFactory.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\Util\ArrayUtil.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\Util\ClassUtil.ts" />
+    <TypeScriptCompile Include="src\main\ts\GB\Util\XMLUtil.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="package.json" />
@@ -44,6 +60,7 @@
       <DependentUpon>web.config</DependentUpon>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

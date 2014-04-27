@@ -1,7 +1,33 @@
 ﻿body {
-    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    border: 0;
+    padding: 0;
 }
 
-span {
-    font-style: italic;
+#content {
+    margin: 0;
+    border: 0;
+    padding: 0;
 }
+
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: Arial, sans-serif;
+}
+
+.play {
+    height: 100%;
+}
+
+input {
+    width: 12em;
+}
+
+h1, input, #play-arena {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+

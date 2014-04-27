@@ -56,6 +56,7 @@ interface HammerGesture {
         pageX: number;
         pageY: number;
     };
+    startEvent: HammerGesture;
 }
 
 declare class Hammer {

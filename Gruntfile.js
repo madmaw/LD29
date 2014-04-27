@@ -10,8 +10,8 @@
                 options: {
                     module: 'amd', //or commonjs
                     target: 'es5', //or es3
-                    base_path: 'src/main/ts',
-                    sourcemap: true,
+                    basePath: 'src/main/ts',
+                    sourceMap: true,
                     declaration: true
                 }
             }
@@ -24,7 +24,6 @@
                 files: {
                     'dist/out.min.js': ['build/out.js'],
                     // compress handlebars
-                    'dist/lib/handlebars-v1.1.2.min.js': ['lib/handlebars-v1.1.2.js'],
                     'dist/lib/analytics.min.js': ['lib/analytics.js']
                 }
             }

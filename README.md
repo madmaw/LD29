@@ -2,4 +2,4 @@ LD29
 ====
 Build viewable here
 
-http://madmaw.github.io/LD29/
+https://madmaw.github.io/LD29/
