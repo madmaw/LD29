@@ -3,13 +3,66 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>TypeScript HTML App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Gun Bat</title>
     <link rel="stylesheet" href="app.css" type="text/css" />
+    <script src="lib/jquery-1.11.0.min.js"></script>
+    <script src="lib/hammer-1.0.6.min.js"></script>
+    <script src="lib/analytics.min.js"></script>
     <script src="out.min.js"></script>
+
+    <script id="home-template" type="text/xsl">
+        <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml"
+                        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                        version="1.0">
+
+            <xsl:output method="html" indent="yes" />
+
+            <xsl:template match="/HomeData">
+                <div class="home">
+                    <h1>
+                        Gun Bat!
+                    </h1>
+                    <p>
+                    <input id="practise" type="button" value="Practise Mode"/>
+                    <br/>
+                    <input id="play" type="button" value="Play!"/>
+                    <br/>
+                    <input id="test-audio" type="button" value="Test Audio"/>
+                    </p>
+                </div>
+            </xsl:template>
+
+
+        </xsl:stylesheet>
+
+    </script>
+
+    <script id="play-template" type="text/xsl">
+        <xsl:stylesheet xmlns="http://www.w3.org/1999/xhtml"
+                        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                        version="1.0">
+
+            <xsl:output method="html" indent="yes" />
+
+            <xsl:template match="/PlayData">
+                <div class="play">
+                    <canvas id="play-arena" width="{arenaDiameter}" height="{arenaDiameter}" style="width:{arenaDiameter}px;height:{arenaDiameter}px;">
+                    </canvas>
+                </div>
+            </xsl:template>
+
+
+        </xsl:stylesheet>
+
+    </script>
+
+
 </head>
 <body>
-    <h1>TypeScript HTML App</h1>
-
-    <div id="content"></div>
+    <div id="content">
+        <h1>Gun Bat</h1>
+    </div>
 </body>
 </html>
