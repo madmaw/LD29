@@ -47,7 +47,7 @@ module GB.State.Play.Spawner {
                         var quantity = 1;
                         while( quantity > 0 && this._heat > 0 && level.canAddMonster(weight.type) )  {
                             this._heat -= weight.coolDownValue;
-
+                            quantity--;
                             var mind = weight.mindFactory();
                             var r = this._minRadius + (this._maxRadius - this._minRadius) * Math.random();
                             var a = Math.PI * 2 * Math.random();
