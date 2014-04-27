@@ -489,6 +489,7 @@
 
             var spawner = new GB.State.Play.Spawner.RandomSpawner(
                 10,
+                5,
                 70,
                 95,
                 weights

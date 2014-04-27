@@ -6,6 +6,7 @@ module GB.State.Play.Spawner {
 
         constructor(
             private _difficulty: number,
+            private _maxDifficulty: number,
             private _minRadius: number,
             private _maxRadius: number,
             private _weights: RandomSpawnerWeight[],
@@ -19,7 +20,7 @@ module GB.State.Play.Spawner {
 
         spawn(level:Level, delta: number): Monster[] {
             var result = [];
-            var progress = Math.min( 1,  Math.sqrt(level.age / 1000) / this._difficulty );
+            var progress = Math.min( this._maxDifficulty,  Math.sqrt(level.age / 1000) / this._difficulty );
             this._heat += delta * progress / 1000;
 
             // are we going to spit out a lot?
