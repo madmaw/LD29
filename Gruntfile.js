@@ -20,6 +20,10 @@
             all:["build", "dist", "dist.zip"]
         },
         uglify: {
+            options: {
+                mangle: false,
+                compress: false
+            },
             dist: {
                 files: {
                     'dist/out.min.js': ['build/out.js'],
