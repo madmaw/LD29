@@ -8,6 +8,7 @@
         public static MONSTER_TYPE_EXPLOSION = 3;
         public static MONSTER_TYPE_CREEPER = 4;
         public static MONSTER_TYPE_SPINNER = 5;
+        public static MONSTER_TYPE_AMBULANCE = 6;
 
         public static MONSTER_TYPE_PLAYER_SUBTYPE_P1 = 0;
         public static MONSTER_TYPE_DUMMY_SUBTYPE_NORMAL = 0;
@@ -15,6 +16,7 @@
         public static MONSTER_TYPE_EXPLOSION_SUBTYPE_NORMAL = 0;
         public static MONSTER_TYPE_CREEPER_SUBTYPE_NORMAL = 0;
         public static MONSTER_TYPE_SPINNER_SUBTYPE_NORMAL = 0;
+        public static MONSTER_TYPE_AMBULANCE_SUBTYPE_NORMAL = 0;
 
         public static RESULT_UNDECIDED = 0;
         public static RESULT_LOST = 1;
@@ -44,9 +46,14 @@
 
         private _hammer:Hammer;
 
+        private _compassWatchId: number;
+        private _compassWatcher: (heading:number)=> void;
+
+
         constructor(
             template: GB.Transformer.ITransformer<PlayData>,
             private _practise: boolean,
+            private _useCompass: boolean,
             private _maxLines: number,
             levelFactory:(player:Monster)=>Level,
             private _player: Monster,
@@ -72,20 +79,22 @@
             };
 
             this._hammerDragHandler = (e:HammerEvent) => {
-                var cx = window.innerWidth/2;
-                var cy = this._arenaDiameter/2;
+                if( !this._useCompass ) {
+                    var cx = window.innerWidth/2;
+                    var cy = this._arenaDiameter/2;
 
-                var sx = e.gesture.startEvent.center.pageX;
-                var sy = e.gesture.startEvent.center.pageY;
-                var ex = e.gesture.deltaX + sx;
-                var ey = e.gesture.deltaY + sy;
+                    var sx = e.gesture.startEvent.center.pageX;
+                    var sy = e.gesture.startEvent.center.pageY;
+                    var ex = e.gesture.deltaX + sx;
+                    var ey = e.gesture.deltaY + sy;
 
-                var dx = ex - cx;
-                var dy = ey - cy;
-                var hammerDragAngle = Math.atan2(dy, dx);
+                    var dx = ex - cx;
+                    var dy = ey - cy;
+                    var hammerDragAngle = Math.atan2(dy, dx);
 
-                var targetAngle = this._hammerDragGrabAngle - hammerDragAngle + this._hammerDragStartAngle;
-                this._playerMind.setTargetZAngle(targetAngle);
+                    var targetAngle = this._hammerDragGrabAngle - hammerDragAngle + this._hammerDragStartAngle;
+                    this._playerMind.setTargetZAngle(targetAngle);
+                }
             };
 
             this._hammerTapHandler = (e:HammerEvent) => {
@@ -101,6 +110,11 @@
                         this.fireNewStateEvent(this._oldState);
                     }
                 }
+            };
+
+            this._compassWatcher = (heading:number) => {
+                // it's that simple
+                this._playerMind.setTargetZAngle((heading * Math.PI) / 180);
             };
 
             this._playerMind = <GB.State.Play.Mind.PlayerMind>this._player.getMind();
@@ -125,6 +139,20 @@
             this._hammer.on("dragend", this._hammerTapHandler);
             this._hammer.on("tap", this._hammerTapHandler);
 
+            var disableCompass = ()=> {
+                this._useCompass = false;
+            };
+            if( this._useCompass != false ) {
+                Compass.needGPS(disableCompass).needMove(disableCompass).init((enabled:boolean)=>{
+                    if( this._useCompass == null && enabled ) {
+                        // if undecided only
+                        this._useCompass = true;
+
+                        this._compassWatchId = Compass.watch(this._compassWatcher);
+                    }
+                });
+            }
+
 
             this._arenaCanvas = <HTMLCanvasElement>document.getElementById("play-arena");
             this._arenaContext = this._arenaCanvas.getContext("2d");
@@ -147,6 +175,10 @@
             this._hammer.off("dragend", this._hammerTapHandler);
             this._hammer.off("tap", this._hammerTapHandler);
             this._level.silence();
+            if( this._compassWatchId != null ) {
+                Compass.unwatch(this._compassWatchId);
+                this._compassWatchId = null;
+            }
             super.stop();
 
         }
@@ -204,39 +236,112 @@
                     var mr = scale * monster.getRadius();
                     var mx = scale * (monster.getX() - this._player.getX());
                     var my = scale * (monster.getY() - this._player.getY());
-                    var sin = Math.sin(monster.getZAngle());
-                    var cos = Math.cos(monster.getZAngle());
+                    var zangle = monster.getZAngle();
+//                    var sin = Math.sin(monster.getZAngle());
+//                    var cos = Math.cos(monster.getZAngle());
+
+                    this._arenaContext.translate(mx, my);
 
                     this._arenaContext.beginPath();
-                    this._arenaContext.moveTo(mx + mr, my);
-                    this._arenaContext.arc(mx, my, mr, 0, Math.PI*2);
-                    this._arenaContext.stroke();
-                    if( toneSequencer.isPlaying(monster.getType(), monster) || !this._level.playerAlive ) {
-                        var type = monster.getType();
-                        var fill;
-                        switch( type ) {
-                            case PlayState.MONSTER_TYPE_CREEPER:
-                                fill = "#00f";
-                                break;
-                            case PlayState.MONSTER_TYPE_DUMMY:
-                                fill = "#0f0";
-                                break;
-                            case PlayState.MONSTER_TYPE_SPINNER:
-                                fill = "#f00";
-                                break;
-                            default:
-                                fill = "#000";
-                                break;
-                        }
 
-                        this._arenaContext.fillStyle = fill;
-                        this._arenaContext.fill();
+                    var fill;
+                    var stroke;
+                    var type = monster.getType();
+                    switch( type ) {
+                        case PlayState.MONSTER_TYPE_CREEPER:
+                            this._arenaContext.rotate(zangle);
+                            this._arenaContext.moveTo(mr, 0);
+                            this._arenaContext.lineTo(-mr, -mr/1.4);
+                            this._arenaContext.lineTo(-mr, mr/1.4);
+                            this._arenaContext.rotate(-zangle);
+                            this._arenaContext.closePath();
+                            fill = "#00f";
+                            stroke = "#aaf";
+                            break;
+                        case PlayState.MONSTER_TYPE_DUMMY:
+                            var h = Math.sin(monster.getAge() / 500) * mr / 2 + mr;
+                            this._arenaContext.moveTo(mr, 0);
+                            this._arenaContext.lineTo(0, -h);
+                            this._arenaContext.lineTo(-mr, 0);
+                            this._arenaContext.lineTo(0, h);
+                            this._arenaContext.closePath();
+                            fill = "#0f0";
+                            stroke = "#afa";
+                            break;
+                        case PlayState.MONSTER_TYPE_SPINNER:
+                            var rangle = monster.getAge() * Math.PI / 1000;
+                            this._arenaContext.rotate(rangle);
+                            this._arenaContext.moveTo(mr, 0);
+                            this._arenaContext.lineTo(mr/4, -mr/4);
+                            this._arenaContext.lineTo(0, -mr);
+                            this._arenaContext.lineTo(-mr/4, -mr/4);
+                            this._arenaContext.lineTo(-mr, 0);
+                            this._arenaContext.lineTo(-mr/4, mr/4);
+                            this._arenaContext.lineTo(0, mr);
+                            this._arenaContext.lineTo(mr/4, mr/4);
+                            this._arenaContext.closePath();
+                            this._arenaContext.rotate(-rangle);
+                            fill = "#b0b";
+                            stroke = "#faf";
+                            break;
+                        case PlayState.MONSTER_TYPE_AMBULANCE:
+                            this._arenaContext.rotate(zangle);
+                            this._arenaContext.moveTo(mr, mr);
+                            this._arenaContext.lineTo(-mr, mr);
+                            this._arenaContext.lineTo(-mr, -mr);
+                            this._arenaContext.lineTo(mr, -mr);
+                            this._arenaContext.closePath();
+                            this._arenaContext.rotate(-zangle);
+                            fill = "#f00";
+                            stroke = "#faa";
+                            break;
+                        case PlayState.MONSTER_TYPE_BULLET:
+                            this._arenaContext.rotate(zangle);
+                            this._arenaContext.moveTo(mr, 0);
+                            this._arenaContext.lineTo(-mr, -mr/2);
+                            this._arenaContext.lineTo(-mr, mr/2);
+                            this._arenaContext.closePath();
+                            this._arenaContext.rotate(-zangle);
+                            stroke = "#ff0";
+                            fill = null;
+                            break;
+                        case PlayState.MONSTER_TYPE_PLAYER:
+                            this._arenaContext.rotate(zangle);
+                            this._arenaContext.moveTo(mr, 0);
+                            this._arenaContext.lineTo(-mr/2, -mr);
+                            this._arenaContext.lineTo(-mr, -mr/2);
+                            this._arenaContext.lineTo(-mr, mr/2);
+                            this._arenaContext.lineTo(-mr/2, mr);
+                            this._arenaContext.closePath();
+                            this._arenaContext.rotate(-zangle);
+                            stroke = "#fff";
+                            fill = null;
+                            break;
+                        default:
+                            this._arenaContext.moveTo(mr, 0);
+                            this._arenaContext.arc(0, 0, mr, 0, Math.PI*2);
+                            fill = null;
+                            stroke = "#fff";
+                            break;
                     }
 
+                    if( fill && (toneSequencer.isPlaying(monster.getType(), monster) || !this._level.playerAlive ) ) {
+                        this._arenaContext.globalAlpha = 0.4;
+                        this._arenaContext.fillStyle = fill;
+                        this._arenaContext.fill();
+                        this._arenaContext.globalAlpha = 1;
+                    }
+                    this._arenaContext.strokeStyle = stroke;
+                    this._arenaContext.stroke();
+
+                    this._arenaContext.translate(-mx, -my);
+
+                    /*
                     this._arenaContext.beginPath();
                     this._arenaContext.moveTo(mx + mr * cos, my + mr * sin);
                     this._arenaContext.lineTo(mx, my);
                     this._arenaContext.stroke();
+                    */
 
                 }
 
@@ -244,8 +349,8 @@
 
             // undo
             this._arenaContext.rotate(-zAngle);
-            var fontSize = Math.floor(this._arenaDiameter / 15);
             if( !this._practise ) {
+                var fontSize = Math.floor(this._arenaDiameter / 15);
                 this._arenaContext.font = fontSize+"px Arial";
                 this._arenaContext.fillStyle = "#fff";
                 this._arenaContext.textAlign = "left";
@@ -255,13 +360,21 @@
                 this._arenaContext.fillText("TIME "+seconds, this._arenaDiameter / 2, this._arenaDiameter/2 - fontSize);
             }
             if( !this._level.playerAlive ) {
-                // show dead
+                var fontSize = Math.floor(this._arenaDiameter / 15);
                 this._arenaContext.font = fontSize+"px Arial";
+                // show dead
                 this._arenaContext.fillStyle = "#fff";
                 this._arenaContext.textAlign = "left";
                 var text = "YOU DEFEATED";
                 var fm = this._arenaContext.measureText(text);
                 this._arenaContext.fillText(text, -fm.width/2, -this._arenaDiameter/2 + fontSize);
+            } else if( this._useCompass ) {
+                var fontSize = Math.floor(this._arenaDiameter / 30);
+                this._arenaContext.font = fontSize+"px Arial";
+                this._arenaContext.fillStyle = "#fff";
+                this._arenaContext.textAlign = "left";
+                this._arenaContext.fillText("compass on", -this._arenaDiameter / 2, -this._arenaDiameter/2 + fontSize);
+
             }
         }
 

@@ -97,7 +97,7 @@
             //var releaseTime = Math.random() * 1;
             var releaseTime = 0.2;
 
-            var frequency = Math.random() * 50 + 350; // - 1000
+            var frequency = Math.random() * 100 + 350; // - 1000
             //var frequency = 392;
 
             //var lfoFrequency = Math.random() * 10;    // 40
@@ -159,7 +159,7 @@
         //var releaseTime = Math.random() * 1;
         var releaseTime = dummyToneDuration / (1000 * 4);
 
-        var frequency = Math.random() * 50 + 200; // - 1000
+        var frequency = Math.random() * 140 + 200; // - 1000
         //var frequency = 392;
 
         //var lfoFrequency = Math.random() * 10;    // 40
@@ -219,7 +219,7 @@
         //var releaseTime = Math.random() * 1;
         var releaseTime = creeperToneDuration / (1000 * 4);
 
-        var frequency = Math.random() * 50 + 100; // - 1000
+        var frequency = Math.random() * 100 + 100; // - 1000
         //var frequency = 392;
 
         //var lfoFrequency = Math.random() * 10;    // 40
@@ -277,7 +277,7 @@
         //var releaseTime = Math.random() * 1;
         var releaseTime = spinnerToneDuration / (1000 * 4);
 
-        var frequency = Math.random() * 100 + 800; // - 1000
+        var frequency = Math.random() * 150 + 800; // - 1000
         //var frequency = 392;
 
         //var lfoFrequency = Math.random() * 10;    // 40
@@ -312,9 +312,9 @@
 
         var proxy = new GB.State.Play.Tone.WebAudioManualPannerToneProxy(
             attackTime,
-            1,
+            0.4,
             decayTime,
-            0.9,
+            0.2,
             releaseTime,
             audioContext,
             tone.getSource(),
@@ -325,7 +325,65 @@
         return proxy;
     };
 
-    var playStateFactory = (oldState:GB.State.IState, practise: boolean) => {
+    var ambulanceToneDuration = beatDuration * 0.75;
+    var ambulanceToneFactory: GB.State.Play.IToneFactory = function() {
+
+        //var attackTime = Math.random() * 1;
+        var attackTime = ambulanceToneDuration / (1000 * 4);
+        //var decayTime = Math.random() * bulletToneDuration / 1000;
+        var decayTime = ambulanceToneDuration / 1000;
+        //var releaseTime = Math.random() * 1;
+        var releaseTime = ambulanceToneDuration / (1000 * 4);
+
+        var frequency = Math.random() * 200 + 600; // - 1000
+        //var frequency = 392;
+
+        //var lfoFrequency = Math.random() * 10;    // 40
+        var lfoFrequency = 2;
+        //var lfoGain = Math.random() * -300 - 300; // - 600
+        var lfoGain = -500;
+
+        //var filterFrequency = Math.random();
+        var filterFrequency = 0.5;
+        //var filterResonance = Math.random();
+        var filterResonance = 0.2;
+
+//        console.log("attack Time "+attackTime);
+//        console.log("decay Time "+decayTime);
+//        console.log("release Time "+releaseTime);
+//        console.log("frequency "+frequency);
+//        console.log("lfo frequency "+lfoFrequency);
+//        console.log("lfo gain "+lfoGain);
+//        console.log("filter frequency "+filterFrequency);
+//        console.log("filter resonance "+filterResonance);
+
+        var tone = new GB.State.Play.Tone.WebAudioSynthTone(
+            frequency,
+            2,
+            1,
+            lfoFrequency,
+            lfoGain,
+            audioContext
+        );
+        tone.setFilterFrequency(filterFrequency);
+        tone.setFilterResonance(filterResonance);
+
+        var proxy = new GB.State.Play.Tone.WebAudioManualPannerToneProxy(
+            attackTime,
+            0.6,
+            decayTime,
+            0.5,
+            releaseTime,
+            audioContext,
+            tone.getSource(),
+            tone
+        );
+        proxy.getSource().connect(audioContext.destination);
+
+        return proxy;
+    };
+
+    var playStateFactory = (oldState:GB.State.IState, practise: boolean, enableCompass: boolean) => {
 
         var explosionMind = new GB.State.Play.Mind.ExplosionMind(explosionToneDuration, 30);
         var explosionFactory = (x:number, y:number, z:number, zAngle:number) => {
@@ -345,6 +403,7 @@
         var dummyMind = new GB.State.Play.Mind.DummyMind(explosionFactory, 2000, 1000, 0.002);
         var creeperMind = new GB.State.Play.Mind.CreeperMind(explosionFactory, 2000, 1000, 0.003);
         var bulletMind = new GB.State.Play.Mind.BulletMind(0, 0, 0.1);
+        var ambulanceMind = new GB.State.Play.Mind.DummyMind(explosionFactory, 6000, 1000, 0.005);
 
         var bulletFactory = (x:number, y:number, z:number, zAngle:number) => {
             var bullet = new GB.State.Play.Monster(
@@ -367,6 +426,7 @@
 
 
             var weights = [];
+
             weights.push(
                 new GB.State.Play.Spawner.RandomSpawnerWeight(
                     40,
@@ -413,6 +473,20 @@
                     spinnerToneFactory
                 )
             );
+            weights.push(
+                new GB.State.Play.Spawner.RandomSpawnerWeight(
+                    5,
+                    20,
+                    1,
+                    GB.State.Play.PlayState.MONSTER_TYPE_AMBULANCE,
+                    GB.State.Play.PlayState.MONSTER_TYPE_AMBULANCE_SUBTYPE_NORMAL,
+                    () => {
+                        return ambulanceMind
+                    },
+                    ambulanceToneFactory
+                )
+            );
+
             var spawner = new GB.State.Play.Spawner.RandomSpawner(
                 10,
                 70,
@@ -425,6 +499,7 @@
             bars[GB.State.Play.PlayState.MONSTER_TYPE_BULLET] = new GB.State.Play.ToneSequencerBar(1, bulletToneDuration);
             bars[GB.State.Play.PlayState.MONSTER_TYPE_CREEPER] = new GB.State.Play.ToneSequencerBar(4, creeperToneDuration);
             bars[GB.State.Play.PlayState.MONSTER_TYPE_SPINNER] = new GB.State.Play.ToneSequencerBar(1, spinnerToneDuration);
+            bars[GB.State.Play.PlayState.MONSTER_TYPE_AMBULANCE] = new GB.State.Play.ToneSequencerBar(2, ambulanceToneDuration);
 
             var level = new GB.State.Play.Level(100, spawner, player, new GB.State.Play.ToneSequencer(bars));
             return level;
@@ -440,6 +515,7 @@
         var playState = new GB.State.Play.PlayState(
             playTransformer,
             practise,
+            enableCompass,
             6,
             levelFactory,
             player,

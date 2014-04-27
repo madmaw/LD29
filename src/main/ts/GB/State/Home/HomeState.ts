@@ -4,7 +4,7 @@
 
         constructor(
             template: GB.Transformer.ITransformer<HomeData>, 
-            private _playStateFactory: (backState:IState, tutorial: boolean)=>IState,
+            private _playStateFactory: (backState:IState, tutorial: boolean, enableCompass: boolean)=>IState,
             private _audioContext: AudioContext
         ) {
             super(template);
@@ -51,7 +51,15 @@
 
         play(practise:boolean): void {
             // launch the play state
-            var playState = this._playStateFactory(this, practise);
+            var enableCompass: boolean;
+            var disableCompassCheckbox = <HTMLInputElement>document.getElementById("disable-compass");
+            if( disableCompassCheckbox.checked ) {
+                enableCompass = false;
+            } else {
+                enableCompass = null;
+            }
+
+            var playState = this._playStateFactory(this, practise, enableCompass);
             this.fireNewStateEvent(playState);
         }
 

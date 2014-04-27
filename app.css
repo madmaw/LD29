@@ -20,11 +20,20 @@ body {
     height: 100%;
 }
 
-input {
-    width: 12em;
+.checkbox {
+    margin-right: 1em;
 }
 
-h1, input, #play-arena {
+.button {
+    width: 16em;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    margin-top: 2em;
+}
+
+h1, #play-arena {
     text-align: center;
     margin-left: auto;
     margin-right: auto;
