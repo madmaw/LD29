@@ -16,6 +16,10 @@ body {
     font-family: Arial, sans-serif;
 }
 
+input {
+    font-size: 16px;
+}
+
 .play {
     height: 100%;
 }
@@ -30,7 +34,7 @@ body {
     margin-left: auto;
     margin-right: auto;
     display: block;
-    margin-top: 2em;
+    margin-top: 1em;
 }
 
 h1, h2, #play-arena, .centered {
@@ -40,3 +44,7 @@ h1, h2, #play-arena, .centered {
     display: block;
 }
 
+.centered {
+    font-size: 14px;
+    font-weight: normal;
+}
