@@ -18,9 +18,14 @@ module GB.State.Play.Spawner {
             return this._maxDuration != null && level.age > this._maxDuration;
         }
 
+        getProgress(level:Level) {
+            return Math.min( this._maxDifficulty,  Math.sqrt(level.age / 1000) / this._difficulty );
+        }
+
         spawn(level:Level, delta: number): Monster[] {
             var result = [];
-            var progress = Math.min( this._maxDifficulty,  Math.sqrt(level.age / 1000) / this._difficulty );
+            var progress = this.getProgress(level);
+            //var progress = this._maxDifficulty;
             this._heat += delta * progress / 1000;
 
             // are we going to spit out a lot?
@@ -44,12 +49,14 @@ module GB.State.Play.Spawner {
                         monsterWeight -= weight.weight;
                     }
                     if( monsterWeight <= 0 ) {
+
                         // we have our monster
                         var quantity = 1;
                         while( quantity > 0 && this._heat > 0 && level.canAddMonster(weight.type) )  {
                             this._heat -= weight.coolDownValue;
                             quantity--;
-                            var mind = weight.mindFactory();
+                            var aggression = Math.pow(Math.max(1, progress), 1.2);
+                            var mind = weight.mindFactory(aggression);
                             var r = this._minRadius + (this._maxRadius - this._minRadius) * Math.random();
                             var a = Math.PI * 2 * Math.random();
                             var mx = Math.cos(a) * r;

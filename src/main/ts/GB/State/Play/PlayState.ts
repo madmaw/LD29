@@ -105,7 +105,7 @@
                     this._playerMind.unsetInput(PlayState.INPUT_FIRE);
 
                     // force an update immediately so iOS can play sounds
-                    this.forceUpdate();
+                    //this.forceUpdate();
                 } else {
                     if( (new Date()).getTime() > this._deathTime + 5000 ) {
                         this.fireNewStateEvent(this._oldState);
@@ -153,7 +153,7 @@
             });
             this._hammer.on("drag", this._hammerDragHandler);
             this._hammer.on("dragstart", this._hammerDragStartHandler);
-            this._hammer.on("dragend", this._hammerTapHandler);
+//            this._hammer.on("dragend", this._hammerTapHandler);
             this._hammer.on("tap", this._hammerTapHandler);
 
             var disableCompass = ()=> {
@@ -282,12 +282,14 @@
                             stroke = "#aaf";
                             break;
                         case PlayState.MONSTER_TYPE_DUMMY:
+                            this._arenaContext.rotate(-zAngle);
                             var h = Math.sin(monster.getAge() / 500) * mr / 2 + mr;
                             this._arenaContext.moveTo(mr, 0);
                             this._arenaContext.lineTo(0, -h);
                             this._arenaContext.lineTo(-mr, 0);
                             this._arenaContext.lineTo(0, h);
                             this._arenaContext.closePath();
+                            this._arenaContext.rotate(zAngle);
                             fill = "#0f0";
                             stroke = "#afa";
                             break;
@@ -382,6 +384,15 @@
                 this._arenaContext.textAlign = "right";
                 this._arenaContext.fillText("TIME "+seconds, this._arenaDiameter / 2, this._arenaDiameter/2 - fontSize);
             }
+//            if( true ) {
+//                var fontSize = Math.floor(this._arenaDiameter / 30);
+//                this._arenaContext.font = fontSize+"px Arial";
+//                this._arenaContext.fillStyle = "#fff";
+//                this._arenaContext.textAlign = "right";
+//                var spawner = <any>this._level["_spawner"];
+//                this._arenaContext.fillText(spawner.getProgress(this._level).toFixed(2), this._arenaDiameter / 2, -this._arenaDiameter/2 + fontSize);
+//
+//            }
             if( !this._level.playerAlive ) {
                 var fontSize = Math.floor(this._arenaDiameter / 15);
                 this._arenaContext.font = fontSize+"px Arial";

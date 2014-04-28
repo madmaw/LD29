@@ -39,14 +39,14 @@ module GB.State.Play.Mind {
             // assume it adds bullets
             if( fireInput ) {
                 if( fireInput.read() ) {
-                    var angle = monster.getZAngle();
-                    var radius = monster.getRadius();
-                    var sin = Math.sin(angle);
-                    var cos = Math.cos(angle);
-                    var dx = cos * radius;
-                    var dy = sin * radius;
-                    var bullet = this._bulletFactory(monster.getX() + dx, monster.getY() + dy, monster.getZ(), monster.getZAngle());
-                    if( level.canAddMonster(bullet.getType()) ) {
+                    if( level.canAddMonster(GB.State.Play.PlayState.MONSTER_TYPE_BULLET) ) {
+                        var angle = monster.getZAngle();
+                        var radius = monster.getRadius();
+                        var sin = Math.sin(angle);
+                        var cos = Math.cos(angle);
+                        var dx = cos * radius;
+                        var dy = sin * radius;
+                        var bullet = this._bulletFactory(monster.getX() + dx, monster.getY() + dy, monster.getZ(), monster.getZAngle());
                         level.addMonster(bullet);
                     }
                 }

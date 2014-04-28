@@ -20,7 +20,11 @@ module GB.State.Play.Tone {
             this._oscillator.frequency.value = frequency;
             this._oscillator.type = oscillatorType;
 
-            this._oscillator.noteOn(0);
+            if( this._oscillator.noteOn ) {
+                this._oscillator.noteOn(0);
+            } else if( this._oscillator.start ) {
+                this._oscillator.start(0);
+            }
 
             this._filter = _audioContext.createBiquadFilter();
             this._filter.frequency.value = 5000;
@@ -31,7 +35,11 @@ module GB.State.Play.Tone {
             this._lfo = _audioContext.createOscillator();
             this._lfo.type = lfoType;
             this._lfo.frequency.value = lfoFrequency;
-            this._lfo.noteOn(0);
+            if( this._lfo.noteOn ) {
+                this._lfo.noteOn(0);
+            } else if( this._lfo.start ) {
+                this._lfo.start(0);
+            }
 
             this._osciFOGain = _audioContext.createGainNode();
             this._osciFOGain.gain.value = osciFOGain;
@@ -74,8 +82,16 @@ module GB.State.Play.Tone {
         }
 
         destroy(when: number): void {
-            this._oscillator.noteOff(0);
-            this._lfo.noteOff(0);
+            if( this._oscillator.noteOff ) {
+                this._oscillator.noteOff(0);
+            } else if( this._oscillator.stop ) {
+                this._oscillator.stop(0);
+            }
+            if( this._lfo.noteOff ) {
+                this._lfo.noteOff(0);
+            } else if( this._oscillator.stop ) {
+                this._lfo.stop(0);
+            }
             this._filter.disconnect();
         }
 

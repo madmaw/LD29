@@ -24,6 +24,9 @@
     } else if( window["webkitAudioContext"] ) {
         audioContext = new webkitAudioContext();
     }
+    if( !audioContext.createGainNode ) {
+        audioContext.createGainNode = audioContext.createGain;
+    }
 
     var domParser = new DOMParser();
     var toXMLTransformer = (t:any) => {
@@ -400,10 +403,7 @@
             return explosion;
         };
 
-        var dummyMind = new GB.State.Play.Mind.DummyMind(explosionFactory, 2000, 1000, 0.002);
-        var creeperMind = new GB.State.Play.Mind.CreeperMind(explosionFactory, 2000, 1000, 0.003);
         var bulletMind = new GB.State.Play.Mind.BulletMind(0, 0, 0.1);
-        var ambulanceMind = new GB.State.Play.Mind.DummyMind(explosionFactory, 6000, 1000, 0.005);
 
         var bulletFactory = (x:number, y:number, z:number, zAngle:number) => {
             var bullet = new GB.State.Play.Monster(
@@ -434,8 +434,8 @@
                     1,
                     GB.State.Play.PlayState.MONSTER_TYPE_CREEPER,
                     GB.State.Play.PlayState.MONSTER_TYPE_CREEPER_SUBTYPE_NORMAL,
-                    () => {
-                        return creeperMind;
+                    (aggression:number) => {
+                        return new GB.State.Play.Mind.CreeperMind(explosionFactory, 2000, 1000, 0.003 * aggression);
                     },
                     creeperToneFactory
                 )
@@ -447,8 +447,8 @@
                     1,
                     GB.State.Play.PlayState.MONSTER_TYPE_DUMMY,
                     GB.State.Play.PlayState.MONSTER_TYPE_DUMMY_SUBTYPE_NORMAL,
-                    () => {
-                        return dummyMind;
+                    (aggression:number) => {
+                        return new GB.State.Play.Mind.DummyMind(explosionFactory, 2000, 1000, 0.002 * aggression);
                     },
                     dummyToneFactory
                 )
@@ -460,13 +460,13 @@
                     1,
                     GB.State.Play.PlayState.MONSTER_TYPE_SPINNER,
                     GB.State.Play.PlayState.MONSTER_TYPE_SPINNER_SUBTYPE_NORMAL,
-                    () => {
+                    (agression:number) => {
                         return new GB.State.Play.Mind.SpinningMind(
                             explosionFactory,
                             2000,
                             1000,
-                            0.01,
-                            0.001,
+                            0.01 * agression,
+                            0.001 * agression,
                             Math.random() > 0.5
                         )
                     },
@@ -480,8 +480,8 @@
                     1,
                     GB.State.Play.PlayState.MONSTER_TYPE_AMBULANCE,
                     GB.State.Play.PlayState.MONSTER_TYPE_AMBULANCE_SUBTYPE_NORMAL,
-                    () => {
-                        return ambulanceMind
+                    (aggression:number) => {
+                        return new GB.State.Play.Mind.DummyMind(explosionFactory, 5000, 1000, 0.005 * aggression);
                     },
                     ambulanceToneFactory
                 )
