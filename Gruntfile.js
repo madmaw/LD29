@@ -176,11 +176,11 @@
                 // Android-only options that will override the defaults set by Phonegap in the
                 // generated AndroidManifest.xml
                 // See https://developer.android.com/guide/topics/manifest/uses-sdk-element.html
-                minSdkVersion: function(){ return(10) },
+                minSdkVersion: function(){ return(19) },
                 targetSdkVersion: function(){ return(19) },
 
                 // iOS7-only options that will make the status bar white and transparent
-                iosStatusBar: 'WhiteAndTransparent'
+                iosStatusBar: 'WhiteAndTransparent',
 
                 // If you want to use the Phonegap Build service to build one or more
                 // of the platforms specified above, include these options.
@@ -195,7 +195,7 @@
 
                 // Set an explicit Android permissions list to override the automatic plugin defaults.
                 // In most cases, you should omit this setting. See 'Android Permissions' in README.md for details.
-                //permissions: ['INTERNET', 'ACCESS_COURSE_LOCATION', '...']
+                permissions: ['INTERNET', 'ACCESS_COARSE_LOCATION', 'ACCESS_FINE_LOCATION', 'READ_PHONE_STATE']
             }
         }
     });

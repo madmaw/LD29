@@ -48,6 +48,7 @@
 
         private _compassWatchId: number;
         private _compassWatcher: (heading:number)=> void;
+        private _deviceOrientationWatcher : (e:any) => void;
 
 
         constructor(
@@ -116,6 +117,22 @@
                 // it's that simple
                 this._playerMind.setTargetZAngle((heading * Math.PI) / 180);
             };
+            var first = true;
+            this._deviceOrientationWatcher = (e:any) => {
+                var alpha = e.alpha;
+                if( alpha != null && e.absolute ) {
+                    this._useCompass = true;
+                    if( first ) {
+                        // just add and remove this to be sure?! (nexus hack?)
+                        window.removeEventListener('deviceorientation', this._deviceOrientationWatcher);
+                        setTimeout(()=> {
+                            window.addEventListener("deviceorientation", this._deviceOrientationWatcher);
+                        }, 100);
+                        first = false;
+                    }
+                    this._playerMind.setTargetZAngle((360 - alpha) * Math.PI / 180);
+                }
+            }
 
             this._playerMind = <GB.State.Play.Mind.PlayerMind>this._player.getMind();
             this._level = levelFactory(this._player);
@@ -140,7 +157,9 @@
             this._hammer.on("tap", this._hammerTapHandler);
 
             var disableCompass = ()=> {
-                this._useCompass = false;
+                if( this._useCompass == null ) {
+                    this._useCompass = false;
+                }
             };
             if( this._useCompass != false ) {
                 Compass.needGPS(disableCompass).needMove(disableCompass).init((enabled:boolean)=>{
@@ -151,6 +170,9 @@
                         this._compassWatchId = Compass.watch(this._compassWatcher);
                     }
                 });
+
+                // attempt to use device orientation
+                window.addEventListener("deviceorientation", this._deviceOrientationWatcher);
             }
 
 
@@ -179,6 +201,7 @@
                 Compass.unwatch(this._compassWatchId);
                 this._compassWatchId = null;
             }
+            window.removeEventListener('deviceorientation', this._deviceOrientationWatcher);
             super.stop();
 
         }
