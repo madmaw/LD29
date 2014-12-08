@@ -59,7 +59,7 @@
         oscillator.frequency.value = 100;
 
 
-        var staticNode = audioContext.createJavaScriptNode(1024, 1, 1);
+        var staticNode = audioContext.createScriptProcessor(1024, 1, 1);
         // iOS needs an input in order for this to work :(
         staticNode.onaudioprocess = function(ev:any) {
             var out = ev.outputBuffer.getChannelData(0);
