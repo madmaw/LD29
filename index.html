@@ -10,6 +10,7 @@
     <script src="lib/jquery-1.11.0.min.js"></script>
     <script src="lib/hammer-1.0.6.min.js"></script>
     <script src="lib/analytics.min.js"></script>
+    <script src="lib/compass-0.1.1.min.js"></script>
     <script src="out.min.js"></script>
 
     <script id="home-template" type="text/xsl">
@@ -24,13 +25,17 @@
                     <h1>
                         Gun Bat!
                     </h1>
-                    <p>
-                    <input id="practise" type="button" value="Practice Mode"/>
+                    <input class="button" id="practise" type="button" value="Practice Mode"/>
+                    <div class="centered">Audio + GFX</div>
+                    <input class="button" id="play" type="button" value="Play!"/>
+                    <div class="centered">Audio only: Headphones required</div>
+                    <div class="button">
+                    <label><input class="checkbox" id="disable-compass" type="checkbox" checked="checked"/>Disable Compass</label>
+                    </div>
+                    <input class="button" id="test-audio" type="button" value="Test Audio"/>
                     <br/>
-                    <input id="play" type="button" value="Play!"/>
-                    <br/>
-                    <input id="test-audio" type="button" value="Test Audio"/>
-                    </p>
+                    <div class="centered">Tested on Desktop Chrome, Mobile Safari, and Android KitKat</div>
+
                 </div>
             </xsl:template>
 
@@ -63,6 +68,7 @@
 <body>
     <div id="content">
         <h1>Gun Bat</h1>
+        <h2>Loading...</h2>
     </div>
 </body>
 </html>
